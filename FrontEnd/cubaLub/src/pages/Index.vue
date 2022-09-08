@@ -2,9 +2,10 @@
   <div>
     <q-btn
       class="q-pa-sm q-ma-md float-right"
-      color="primary"
+      color="teal"
       label="Crear nueva seccion"
       @click="data.cardCrearSesion = true"
+      v-if="store.state.jwt!=''"
     />
     <q-dialog v-model="data.cardCrearSesion">
       <q-card class="my-card">
@@ -38,10 +39,11 @@
         {{ sesion.Title }}
         <q-btn
           flat
-          color="primary"
+          color="teal"
           icon="edit"
           size="sm"
           @click="editSesions(sesion)"
+          v-if="store.state.jwt!=''"
         />
         <q-dialog v-model="data.cardEditSesion">
           <q-card class="my-card">
@@ -89,6 +91,14 @@
                 label="Nombre de la Opcion"
                 class="my-input"
               />
+              <q-uploader
+                    :factory="factoryFile"
+                    color="teal"
+                    class="newFile"
+                    flat
+                    bordered
+                  >
+              </q-uploader>
             </q-card-section>
 
             <q-separator />
@@ -106,10 +116,11 @@
         </q-dialog>
         <q-btn
           flat
-          color="primary"
+          color="teal"
           icon="delete"
           size="sm"
           @click="deletSesion(sesion.id)"
+          v-if="store.state.jwt!=''"
         />
       </h6>
       <q-list
@@ -133,11 +144,11 @@
         </q-item>
         <q-btn
           flat
-          color="primary"
+          color="teal"
           icon="edit"
           size="sm"
           @click="editOpcions(opcion)"
-          v-if="opcion.Title != null"
+          v-if="opcion.Title != null && store.state.jwt!=''"
           class="col-1"
         />
         <q-dialog v-model="data.cardEditOpcion">
@@ -152,6 +163,19 @@
                 label="Nombre de la Opcion"
                 class="my-input"
               />
+              <q-input
+                v-model="data.editFileOpcion"
+                label="Nombre del Archivo"
+                class="my-input"
+              />
+              <q-uploader
+                    :factory="factoryFile"
+                    color="teal"
+                    class="newFile"
+                    flat
+                    bordered
+                  >
+              </q-uploader>
             </q-card-section>
 
             <q-separator />
@@ -169,11 +193,11 @@
         </q-dialog>
         <q-btn
           flat
-          color="primary"
+          color="teal"
           icon="delete"
           size="sm"
           @click="deletOpcion(opcion.id)"
-          v-if="opcion.Title != null"
+          v-if="opcion.Title != null && store.state.jwt!=''"
           class="col-1"
         />
       </q-list>
@@ -184,7 +208,9 @@
 <script setup>
 import axios from "axios";
 import { api } from "boot/axios.js";
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted,inject } from "vue";
+
+const store = inject("store");
 
 let data = reactive({
   sesiones: [],
@@ -203,11 +229,28 @@ let data = reactive({
   editUrlOpcion: "",
   idOpcion: "",
   cardEditOpcion: false,
+  editFileOpcion:"",
+
+  idImg:""
 });
 
 onMounted(() => {
   getSesions();
 });
+
+async function factoryFile(file) {
+      try {
+        console.log(file);
+        const fd = new FormData();
+        fd.append("files", file[0]);
+        await api.post(`/upload`, fd).then((res) => {
+          console.log(res);
+          data.idImg = res.data[0].id;
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
 function editSesions(params) {
   (data.editTitleSeccion = params.Title),
@@ -252,6 +295,7 @@ async function deletSesion(params) {
 function editOpcions(params) {
   (data.editTitleOpcion = params.Title),
     (data.idOpcion = params.id),
+    data.editFileOpcion=params.Name,
     (data.cardEditOpcion = true);
 }
 
@@ -263,9 +307,13 @@ async function EditOpcion(params) {
       // },
       data: {
         Titulo: data.editTitleOpcion,
+        Archivo:{
+          id:data.idImg
+        }
       },
     })
     .then(function (response) {
+      data.idImg=""
       console.log(response);
       getSesions();
     })
@@ -313,6 +361,9 @@ async function crearOpcion(params) {
     .post("/opcions", {
       data: {
         Titulo: data.titleOpcion,
+        Archivo:{
+          id:data.idImg
+        },
         sesion:{
            id:params
         }
@@ -322,7 +373,8 @@ async function crearOpcion(params) {
       // },
     })
     .then((response) => {
-      data.titleOpcion=""
+      data.titleOpcion="",
+      data.idImg=""
       getSesions();
     })
     .catch((error) => {
@@ -357,6 +409,7 @@ async function getSesions() {
                 response.data.data[i].attributes.opcions.data[j].attributes
                   .Titulo,
               Url: `${data.host}${response.data.data[i].attributes.opcions.data[j].attributes.Archivo.data[0].attributes.url}`,
+              Name:response.data.data[i].attributes.opcions.data[j].attributes.Archivo.data[0].attributes.name
             });
           } else {
             data.sesiones[i].Opcions.push({
