@@ -15,19 +15,11 @@
     "Titulo": {
       "type": "string"
     },
-    "Media": {
-      "type": "media",
-      "multiple": true,
-      "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
-    "testing": {
-      "type": "richtext"
+    "opcions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::opcion.opcion",
+      "mappedBy": "sesion"
     }
   }
 }

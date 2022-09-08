@@ -5,6 +5,8 @@
         <q-toolbar-title class="text-center">
           GUIA DE AUTOCONTROL A CAPITAL HUMANO 2022
         </q-toolbar-title>
+        <q-btn flat  label="Login" :to="{ name: 'login' }"/>
+        <q-btn flat  label="Logout" />
       </q-toolbar>
     </q-header>
 
