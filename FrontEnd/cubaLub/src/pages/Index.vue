@@ -138,7 +138,7 @@
           v-if="opcion.Title != null"
           class="col-10"
         >
-          <q-item-section>
+          <q-item-section >
             {{ opcion.Title }}
           </q-item-section>
         </q-item>
@@ -231,7 +231,7 @@ let data = reactive({
   cardEditOpcion: false,
   editFileOpcion:"",
 
-  idImg:""
+  idImg:"",
 });
 
 onMounted(() => {

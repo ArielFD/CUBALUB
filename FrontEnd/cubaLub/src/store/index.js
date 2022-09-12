@@ -2,7 +2,7 @@ import { reactive } from "vue";
 import axios from "axios";
 
 const state = reactive({
-  jwt: null,
+  jwt: "",
   user: null,
   errors: "",
   alerts: [

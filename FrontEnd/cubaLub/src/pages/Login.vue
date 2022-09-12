@@ -11,7 +11,7 @@
         <q-card-section>
           <div class="row items-center no-wrap">
             <div class="col">
-              <div class="text-h6">Loguin</div>
+              <div class="text-h6">Login</div>
             </div>
 
             <div class="col-auto">
@@ -151,7 +151,7 @@ import { api } from "boot/axios.js";
           localStorage.setItem("jwt", response.data.jwt);
           localStorage.setItem("userData", JSON.stringify(store.state.user));
           localStorage.setItem("fallo", "0");
-          router.push("/principal");
+          router.push("/");
           conect(store.state.jwt);
           socket.emit("join", {});
         })
